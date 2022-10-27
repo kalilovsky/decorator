@@ -20,6 +20,9 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class DecoratorCommand extends Command
 {
+    //Implémentez la facturation d’un dessert. Il est possible de choisir des boules de glaces (vanille, fraise et café),à 1 euro chacune,
+    // sachant qu’on peut mettre dans la même coupe des parfums différents. L’utilisateur peut aussi ajouter de la chantilly (pour 0.5)
+    // et le nappage (sauce caramel ou chocolat) est à 0.75 euros.
     const DESSERT_CHOICES = [
         'Vanille',
         'Chocolat',
@@ -27,7 +30,7 @@ class DecoratorCommand extends Command
         'Pistache'
     ];
 
-    public function __construct( private Chocolat $vannile)
+    public function __construct()
     {
         parent::__construct();
     }
