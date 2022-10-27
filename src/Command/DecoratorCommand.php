@@ -2,12 +2,16 @@
 
 namespace App\Command;
 
+use App\Classes\Gout\Chocolat;
+use App\Classes\Gout\Gout;
+use App\Classes\Gout\Vannile;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
 #[AsCommand(
@@ -16,6 +20,18 @@ use Symfony\Component\Console\Style\SymfonyStyle;
 )]
 class DecoratorCommand extends Command
 {
+    const DESSERT_CHOICES = [
+        'Vanille',
+        'Chocolat',
+        'Fraise',
+        'Pistache'
+    ];
+
+    public function __construct( private Chocolat $vannile)
+    {
+        parent::__construct();
+    }
+
     protected function configure(): void
     {
         $this
@@ -27,18 +43,32 @@ class DecoratorCommand extends Command
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $io = new SymfonyStyle($input, $output);
-        $arg1 = $input->getArgument('arg1');
+        $t = new Vannile();
+        $t = new Chocolat($t);
+        $helper = $this->getHelper('question');
 
-        if ($arg1) {
-            $io->note(sprintf('You passed an argument: %s', $arg1));
-        }
+        $question = new ChoiceQuestion(
+            'Choisissez votre glace :',
+            // choices can also be PHP objects that implement __toString() method
+            self::DESSERT_CHOICES,
 
-        if ($input->getOption('option1')) {
-            // ...
-        }
+        );
+        $question->setMultiselect(true);
+        $question->setErrorMessage('Color %s is invalid.');
 
-        $io->success('You have a new command! Now make it your own! Pass --help to see your options.');
+        $color = $helper->ask($input, $output, $question);
+        $output->writeln('You have just selected: '. implode(',',$color));
 
         return Command::SUCCESS;
+    }
+
+    private function getDessertChoices(): string
+    {
+        $result = '';
+        foreach (self::DESSERT_CHOICES as $key => $dessert){
+            $result .= ($key + 1) . '-' . $dessert . PHP_EOL;
+        }
+
+        return $result;
     }
 }
